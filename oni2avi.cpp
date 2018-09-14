@@ -18,10 +18,12 @@ namespace fs = boost::filesystem;
 #define OPENNI2
 // OpenNI or OpenNI2
 #ifdef OPENNI2
-#include <OpenNI.h>
+//#include <OpenNI.h>
+#include <openni2/OpenNI.h>
 #define THROW_IF_FAILED(retVal) {if (retVal != openni::STATUS_OK) throw openni::OpenNI::getExtendedError();}
 #else
-#include <XnCppWrapper.h>
+//#include <XnCppWrapper.h>
+#include <ni/XnCppWrapper.h>
 #define THROW_IF_FAILED(retVal) {if (retVal != XN_STATUS_OK) throw xnGetStatusString(retVal);}
 #endif
 
@@ -60,7 +62,7 @@ class CodecName2FourCC
 
 std::ostream& operator << (std::ostream& stream, const OniVersion& item)
 {
-    stream << static_cast<int>(item.major) << "." << static_cast<int>(item.minor) << "." 
+    stream << static_cast<int>(item.major) << "." << static_cast<int>(item.minor) << "."
            << item.maintenance << ". Build " << item.build;
     return stream;
 }
@@ -71,7 +73,7 @@ std::ostream& operator << (std::ostream& stream, openni::Device& device)
     auto sinfoDepth = device.getSensorInfo(openni::SENSOR_DEPTH);
     auto sinfoImg = device.getSensorInfo(openni::SENSOR_COLOR);
     const openni::DeviceInfo& item = device.getDeviceInfo();
-    stream << "\tType: " << sinfoDepth->getSensorType() << ", " << sinfoImg->getSensorType() 
+    stream << "\tType: " << sinfoDepth->getSensorType() << ", " << sinfoImg->getSensorType()
            << ". Generator name:  " << item.getName() << ". Vendor: " << item.getVendor() << "." << std::endl;
     return stream;
 }
@@ -166,7 +168,7 @@ class Oni2AviConverter
             vm.setPixelFormat(openni::PIXEL_FORMAT_RGB888);
         }
 
-        openni::VideoStream depthStream;        
+        openni::VideoStream depthStream;
         if (device.getSensorInfo(openni::SENSOR_DEPTH) == nullptr)
             throw "ERROR: getSensorInfo returned null for depth";
         THROW_IF_FAILED( depthStream.create(device, openni::SENSOR_DEPTH) );
@@ -187,11 +189,11 @@ class Oni2AviConverter
         //fs::path currentFolder("./");
         //fs::file_status st = fs::status(currentFolder);
         //std::cout << (st.permissions() & fs::all_all) << std::endl;
-        boost::filesystem::wpath file(outputFileImg); 
-        if(boost::filesystem::exists(file)) 
-            boost::filesystem::remove(file); 
-        file = outputFileDepth;        
-        if(!depthAsPng && boost::filesystem::exists(file)) 
+        boost::filesystem::wpath file(outputFileImg);
+        if(boost::filesystem::exists(file))
+            boost::filesystem::remove(file);
+        file = outputFileDepth;
+        if(!depthAsPng && boost::filesystem::exists(file))
             boost::filesystem::remove(file);
 
         cv::VideoWriter imgWriter(outputFileImg, m_codecName2Code(codecName), fps, cvSize(frame_width, frame_height), 1);
@@ -221,15 +223,17 @@ class Oni2AviConverter
 
         size_t outStep = nframes > 10 ? nframes / 10 : 1;
 
-        try    
+        try
         {
             int iframe = 0;
-            while (iframe < nframes) 
+            while (iframe < nframes)
             {
+                /*
                 if (playbackControl->seek(imageStream, iframe) != openni::STATUS_OK || playbackControl->seek(depthStream, iframe) != openni::STATUS_OK)
                     throw "Something went wrong while reading frame";
                 if ( iframe % outStep == 0 )
                     std::cout << iframe << "/" << nframes << std::endl;
+                */
 
                 // save image
                 openni::VideoFrameRef frame;
@@ -254,7 +258,7 @@ class Oni2AviConverter
                 //ss_depth << "depth-" << iframe;
                 //std::string depth_mat = ss_depth.str();
                 //cv::FileStorage file(depth_mat, cv::FileStorage::WRITE);
-                //file << depth_mat << depth; 
+                //file << depth_mat << depth;
 
                 if (!depthAsPng)
                 {

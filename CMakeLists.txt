@@ -20,8 +20,10 @@ find_package(Boost 1.40 COMPONENTS program_options filesystem system REQUIRED )
 
 #not configures as it should, at least for homebrew, so do manually
 #find_package(OpenNI 2 REQUIRED)
-set(OPENNI2_INCLUDE "/usr/local/include/ni2")
-set(OPENNI2_REDIST "/usr/local/lib/ni2/libOpenNI2.dylib")
+#set(OPENNI2_INCLUDE "/usr/local/include/ni2")
+#set(OPENNI2_REDIST "/usr/local/lib/ni2/libOpenNI2.dylib")
+set(OPENNI2_INCLUDE "/usr/include/openni2")
+set(OPENNI2_REDIST "/usr/lib/libOpenNI2.so")
 include_directories(${OPENNI2_INCLUDE})
 
 if (MSVC)
